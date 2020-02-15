@@ -1,0 +1,31 @@
+#include <Arduino.h>
+
+#define outputPin D6
+
+void setup() {
+  // put your setup code here, to run once:
+  pinMode(outputPin, OUTPUT);
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  digitalWrite(outputPin, LOW);
+  delay(1000);
+  //Start bit
+  digitalWrite(outputPin, HIGH);
+  delay(200);
+  digitalWrite(outputPin, LOW);
+  delay(30);
+  // Start ringing
+  int callAddress = random(1,14);
+  int i = 0;
+  while( i <= callAddress) {
+    i++;
+    digitalWrite(outputPin, HIGH);
+    delayMicroseconds(24);
+    digitalWrite(outputPin, LOW);
+    delayMicroseconds(70);
+  }
+  
+  delay(10000);
+}
