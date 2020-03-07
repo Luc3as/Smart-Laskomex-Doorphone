@@ -2,13 +2,12 @@
 
 const byte interruptPin = D7;
 volatile byte interruptCounter = 0;
-int numberOfInterrupts = 0;
 bool startOfCommand = false;
 bool endOfCommand = false;
 int ringingAddress = 0;
 unsigned long lastTime = 0;
 
-#define DEBUG
+//#define DEBUG
   
 ICACHE_RAM_ATTR void handleInterrupt() {
   interruptCounter++;
@@ -17,22 +16,22 @@ ICACHE_RAM_ATTR void handleInterrupt() {
 void setup() {
  
   Serial.begin(115200);
-  pinMode(interruptPin, INPUT_PULLUP);
+  pinMode(interruptPin, INPUT);
   attachInterrupt(digitalPinToInterrupt(interruptPin), handleInterrupt, CHANGE);
  
 }
 
 void loop() {
-   if(interruptCounter>0){
+  //Serial.println(interruptPin ? "HIGH" : "LOW") ;
+  if(interruptCounter>0){  // We have interrupt, do something
       unsigned long now = micros();
       uint32_t timeDifference = now - lastTime ;
       lastTime = now;
       interruptCounter--;
-      //numberOfInterrupts++;
 
-      if( timeDifference >= 180 * 1000  && timeDifference <= 230 * 1000  ) {
+      if( timeDifference >= 150 * 1000  && timeDifference <= 250 * 1000  ) {  // 200 ms
         // We have starting or ending bit
-        if(startOfCommand == false ) {
+        if(startOfCommand == false ) {  // Start command
           startOfCommand = true;
           endOfCommand = false;
           ringingAddress = 0;
@@ -41,10 +40,11 @@ void loop() {
             Serial.println();
             Serial.println("Starting command");  
           #endif
-        } else {
+        } else {                        // End command
           endOfCommand = true;
           #ifdef DEBUG
             Serial.println("Ending command");  
+            Serial.println();
           #endif
         }
         #ifdef DEBUG
@@ -54,7 +54,7 @@ void loop() {
         #endif
       }
     
-    if( timeDifference >= 18 && timeDifference <= 30 && startOfCommand == true ) {
+    if( timeDifference >= 19 && timeDifference <= 29 && startOfCommand == true ) {  // 24 us
       // We are in command mode, start counting pulses
       ringingAddress++;
       #ifdef DEBUG
@@ -70,25 +70,22 @@ void loop() {
 
   }
 
-  // Timeouts
-  unsigned long now = micros();
-  uint32_t timeDifference = now - lastTime ;
-  if( timeDifference >= 3 * 1000  && startOfCommand == true && ringingAddress > 0) {
-    // there were no pulses for 3 ms, trigger timeout
-    endOfCommand = true;
-    startOfCommand = false;
-    #ifdef DEBUG
-      Serial.print("There is call to phone : ");
-      Serial.println(ringingAddress);
-    #endif
-    #ifdef DEBUG
-        Serial.print("Pulse time: ");  
-        Serial.print(timeDifference);  
-        Serial.println(" us");
-    #endif
-  }
-  if( timeDifference >= 1000 * 1000 && startOfCommand == true ) {
-    
+ // Timeouts
+ unsigned long now = micros();
+ uint32_t timeDifference = now - lastTime ;
+ if( timeDifference >= 10 * 1000  && startOfCommand == true && ringingAddress > 0) {  // 10 ms
+   // there were no pulses, trigger timeout
+   endOfCommand = true;
+   startOfCommand = false;
+   Serial.print("There is call to phone : ");
+   Serial.println(ringingAddress);
+   #ifdef DEBUG
+       Serial.print("Pulse time: ");  
+       Serial.print(timeDifference);  
+       Serial.println(" us");
+   #endif
+ }
+  if( timeDifference >= 1000 * 1000 && startOfCommand == true ) {   // Timeoute for inactivity 1 s
     startOfCommand = false;
     endOfCommand = true;
     ringingAddress = 0;

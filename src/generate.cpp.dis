@@ -5,26 +5,35 @@
 void setup() {
   // put your setup code here, to run once:
   pinMode(outputPin, OUTPUT);
+  Serial.begin(115200);
 }
 
 void loop() {
+  int callAddress = random(1,14);
+  Serial.print("Ringing to phone: ");  
+  Serial.println(callAddress);  
   // put your main code here, to run repeatedly:
-  digitalWrite(outputPin, LOW);
+  digitalWrite(outputPin, HIGH);
   delay(1000);
   //Start bit
-  digitalWrite(outputPin, HIGH);
-  delay(200);
   digitalWrite(outputPin, LOW);
-  delay(30);
+  delay(random(155,245));
+  digitalWrite(outputPin, HIGH);
+  delay(random(10,70));
   // Start ringing
-  int callAddress = random(1,14);
   int i = 0;
-  while( i <= callAddress) {
+  while( i < callAddress) {
     i++;
-    digitalWrite(outputPin, HIGH);
-    delayMicroseconds(24);
     digitalWrite(outputPin, LOW);
-    delayMicroseconds(70);
+    delayMicroseconds(random(20,28));
+    digitalWrite(outputPin, HIGH);
+    delayMicroseconds(random(65,1200));
+  }
+  //End bit
+  if(random(0,1) == 1) {
+    digitalWrite(outputPin, LOW);
+    delay(random(155,245));
+    digitalWrite(outputPin, HIGH);
   }
   
   delay(10000);

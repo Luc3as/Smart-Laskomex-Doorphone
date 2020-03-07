@@ -2,7 +2,7 @@
 
 There is 200ms pulse when the line is 0V before start and at the end of each command.
 
-Then the bus goes up to around 11V, and if there is incoming call, there are number of spikes down to zero, the each spike is 24 us long, and there is 60us to 1ms gap between these pulses. After 2ms we can rise timeout of pulse reading. 
+Then the bus goes up to around 11V, and if there is incoming call, there are number of spikes down to zero, the each spike is 24 us long, and there is 60us to 1000us gap between these pulses. After 2ms we can rise timeout of pulse reading. 
 
 Number of pulses corresponds to number of doorphone configured through jumpers on phones PCB
 
