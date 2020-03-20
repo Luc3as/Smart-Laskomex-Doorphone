@@ -12,3 +12,11 @@ Number of pulses corresponds to number of doorphone configured through jumpers o
 * in the loop we check how long it was from last interrupt, if it matches starting pulse, or shor 24us pulse, we increment corresponding variable
 * if there is no pulse for 1s , we run timeout, and set variables to start state
 
+### If You liked my work, You can buy me a coffee :)
+
+<a class="" target="_blank" href="https://www.buymeacoffee.com/luc3as"><img src="https://lukasporubcan.sk/images/buymeacoffee.png" alt="Buy Me A Coffee" style="max-width: 217px !important;"></a>
+
+### Or send some crypto
+
+<a class="" target="_blank" href="https://lukasporubcan.sk/donate"><img src="https://lukasporubcan.sk/images/donatebitcoin.png" alt="Donate Bitcoin" style="max-width: 217px !important;"></a>	
+			
