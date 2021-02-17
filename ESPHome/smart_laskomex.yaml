@@ -1,0 +1,123 @@
+substitutions:
+  devicename: "panelakovy_telefon"
+  upper_devicename: "Panelákový telefón"
+
+esphome:
+  name: $devicename
+  platform: ESP8266
+  board: d1_mini
+  includes:
+    - smart-laskomex.h
+  on_boot:
+    priority: -100
+    then:
+      - switch.turn_on: arduino_reset
+      - delay: 500ms
+      - switch.turn_off: arduino_reset
+
+wifi:
+  networks:
+  - ssid: "Luc3as-IoT2"
+    password: !secret Luc3as_IOT_WIFI_PASS
+  manual_ip:
+    static_ip: 192.168.3.125
+    gateway: 192.168.3.1
+    subnet: 255.255.255.0 
+    dns1: 192.168.3.1
+
+# Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: ${upper_devicename} Hotspot
+    password: !secret esphome_fallback_ap_pass
+
+captive_portal:
+
+
+# Enable logging
+logger:
+  level: DEBUG
+  #level: VERY_VERBOSE
+  esp8266_store_log_strings_in_flash: False
+
+# Enable Home Assistant API
+api:
+  password: !secret esphome_api_pass
+
+ota:
+  password: !secret esphome_ota_pass
+
+uart:
+  id: uart_bus
+  tx_pin: D0
+  rx_pin: D1
+  baud_rate: 115200
+
+text_sensor:
+  - platform: template
+    name: ${upper_devicename} uptime
+    lambda: |-
+      uint32_t dur = id(uptime_s).state;
+      int dys = 0;
+      int hrs = 0;
+      int mnts = 0;
+      if (dur > 86399) {
+        dys = trunc(dur / 86400);
+        dur = dur - (dys * 86400);
+      }
+      if (dur > 3599) {
+        hrs = trunc(dur / 3600);
+        dur = dur - (hrs * 3600);
+      }
+      if (dur > 59) {
+        mnts = trunc(dur / 60);
+        dur = dur - (mnts * 60);
+      }
+      char buffer[17];
+      sprintf(buffer, "%ud %02uh %02um %02us", dys, hrs, mnts, dur);
+      return {buffer};
+    icon: mdi:clock-start
+    update_interval: 30s
+  
+sensor:
+  - platform: uptime
+    id: uptime_s
+    update_interval: 30s
+  - platform: wifi_signal
+    name: ${upper_devicename} WiFi Signal
+    update_interval: 60s  
+
+  - platform: custom
+    lambda: |-
+      auto door_phone = new DoorPhone(id(uart_bus));
+      App.register_component(door_phone);
+      return {door_phone->called_number};
+      
+    sensors:
+      name: "Volané poschodie"    
+      icon: mdi:elevator-passenger
+    
+switch:
+  - platform: restart
+    name: ${upper_devicename} reštart
+  
+  - platform: gpio
+    pin:
+      number: D7
+      inverted: yes
+    id: arduino_reset
+    restore_mode: ALWAYS_OFF
+
+  - platform: gpio
+    pin:
+      number: D6
+      inverted: no
+    id: relay
+    restore_mode: ALWAYS_OFF 
+    
+  - platform: template
+    name: "Rele"
+    icon: "mdi:gate"
+    turn_on_action:
+    - switch.turn_on: relay
+    - delay: 1000ms
+    - switch.turn_off: relay    

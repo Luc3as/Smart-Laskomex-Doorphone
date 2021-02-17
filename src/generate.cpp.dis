@@ -1,3 +1,6 @@
+// Example Arduino sketch to generate signals simulating laskomex ringing
+
+
 #include <Arduino.h>
 
 #define outputPin D6

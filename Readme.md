@@ -12,6 +12,27 @@ Number of pulses corresponds to number of doorphone configured through jumpers o
 * in the loop we check how long it was from last interrupt, if it matches starting pulse, or shor 24us pulse, we increment corresponding variable
 * if there is no pulse for 1s , we run timeout, and set variables to start state
 
+If there is voltage ( AC with square wave ) at GND and BR contacts, the ringing is coming from corridor behind the doors. 
+
+
+## Sensing the ringining
+I used separate arduino for sensing the tight timing of ringing patterns, as the ESP8266 was not able to count all interrupts while handling other functions like maintaining wifi or MQTT connection. 
+
+Output from arduino is serial line, where decoded numbers of ringing phone address is sent. 
+
+There is ESPHome sketch receiving this serial messages.
+
+## Connection
+I used zener diodes to limit inputs of voltage line for ESP8266 3v3 logic. 
+
+## Opening the door
+Work in progress
+I need to solve relay configuration to act as picking up the phone and pressing button for opening the doors.
+
+## Images
+Images from PCB and osciloscope are in Images folder. 
+
+
 ### If You liked my work, You can buy me a coffee :)
 
 <a class="" target="_blank" href="https://www.buymeacoffee.com/luc3as"><img src="https://lukasporubcan.sk/images/buymeacoffee.png" alt="Buy Me A Coffee" style="max-width: 217px !important;"></a>
